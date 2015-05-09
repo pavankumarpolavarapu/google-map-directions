@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+   <head>
+        <title>jQuery mobile with Google maps</title>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places"></script>
+        <script type="text/javascript">
+        function setiFrameSource(){
+            var iFrame = document.getElementById("iFrame");
+            var Url = "https://www.google.com/maps/embed/v1/directions?";
+            var origin = "origin=".concat(document.getElementById("origin").value).concat("&");
+            var destination = "destination=".concat(document.getElementById("destination").value).concat("&");
+            var key = "key=".concat(document.getElementById("key").value);
+            Url = Url.concat( origin, destination, key );
+            iFrame.src= Url;
+        }
+
+        function initialize() {
+          // Create the autocomplete object, restricting the search
+          // to geographical location types.
+          origin = new google.maps.places.Autocomplete(
+              /** @type {HTMLInputElement} */(document.getElementById('origin')),
+              { types: ['geocode'] });
+          destination = new google.maps.places.Autocomplete(
+              /** @type {HTMLInputElement} */(document.getElementById('destination')),
+              { types: ['geocode'] });
+          // When the user selects an address from the dropdown,
+          // populate the address fields in the form.
+          google.maps.event.addListener(origin, 'place_changed', function() {
+            fillInAddress();
+          });
+          google.maps.event.addListener(destination, 'place_changed', function() {
+            fillInAddress();
+          });
+        }
+
+        // [START region_geolocation]
+        // Bias the autocomplete object to the user's geographical location,
+        // as supplied by the browser's 'navigator.geolocation' object.
+        function geolocate() {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+              var geolocation = new google.maps.LatLng(
+                  position.coords.latitude, position.coords.longitude);
+              var circle = new google.maps.Circle({
+                center: geolocation,
+                radius: position.coords.accuracy
+              });
+              autocomplete.setBounds(circle.getBounds());
+            });
+          }
+        }
+
+</script>
+    </head>
+    <body onload="initialize()">
+        <form method="get" target="iFrame">
+        <input id="origin" style="width:82%;" placeholder="Put Origin here" name="origin" type="text" onFocus="geolocate()"/>
+        <input id="destination" style="width:82%;" placeholder="Put Origin here" name="destination" type="text" onFocus="geolocate()"/>
+        <input id="key" type="hidden" name="key" value="AIzaSyD4iE2xVSpkLLOXoyqT-RuPwURN3ddScAI">
+        <input style="width:8%;" type="button" value="Go" onclick="setiFrameSource();"/>
+        </form>
+        <iframe id="iFrame" name="iFrame" src="https://www.google.com/maps/embed/v1/directions?origin=Hyderabad&destination=JNTU Busstop&key=AIzaSyD4iE2xVSpkLLOXoyqT-RuPwURN3ddScAI" style="height:500px;width:500px" ></iframe>
+
+
+    </body>
+</html>
